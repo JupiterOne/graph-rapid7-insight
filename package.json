@@ -1,7 +1,7 @@
 {
-  "name": "@jupiterone/integration-template",
+  "name": "@jupiterone/graph-rapid7-insightvm",
   "version": "0.0.0",
-  "description": "A JupiterOne Integration",
+  "description": "A graph conversion tool for Rapid7 InsightVM",
   "license": "MPL-2.0",
   "main": "src/index.js",
   "types": "src/index.d.ts",
