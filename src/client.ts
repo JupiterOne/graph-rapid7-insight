@@ -1,7 +1,4 @@
-import { IntegrationProviderAuthenticationError } from '@jupiterone/integration-sdk-core';
-
 import { IntegrationConfig } from './config';
-import { AcmeUser, AcmeGroup } from './types';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
