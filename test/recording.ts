@@ -12,7 +12,7 @@ export function setupProjectRecording(
 ): Recording {
   return setupRecording({
     ...input,
-    redactedRequestHeaders: ['Authorization'],
+    redactedRequestHeaders: ['X-Api-Key'],
     redactedResponseHeaders: ['set-cookie'],
     mutateEntry: mutations.unzipGzippedRecordingEntry,
     /*mutateEntry: (entry) => {

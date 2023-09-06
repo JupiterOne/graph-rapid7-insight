@@ -1,10 +1,7 @@
 import { IntegrationInvocationConfig } from '@jupiterone/integration-sdk-core';
 import { integrationSteps } from './steps';
-import {
-  validateInvocation,
-  IntegrationConfig,
-  instanceConfigFields,
-} from './config';
+import { IntegrationConfig, instanceConfigFields } from './config';
+import { validateInvocation } from './validateInvocation';
 
 export const invocationConfig: IntegrationInvocationConfig<IntegrationConfig> =
   {
