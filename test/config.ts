@@ -10,12 +10,12 @@ if (process.env.LOAD_ENV) {
     path: path.join(__dirname, '../.env'),
   });
 }
-const DEFAULT_CLIENT_ID = 'dummy-acme-client-id';
-const DEFAULT_CLIENT_SECRET = 'dummy-acme-client-secret';
+const DEFAULT_API_URL = 'us.api.insight.rapid7.com';
+const DEFAULT_API_KEY = 'api-key';
 
 export const integrationConfig: IntegrationConfig = {
-  clientId: process.env.CLIENT_ID || DEFAULT_CLIENT_ID,
-  clientSecret: process.env.CLIENT_SECRET || DEFAULT_CLIENT_SECRET,
+  apiUrl: process.env.API_URL || DEFAULT_API_URL,
+  apiKey: process.env.API_KEY || DEFAULT_API_KEY,
 };
 
 export function buildStepTestConfigForStep(stepId: string): StepTestConfig {

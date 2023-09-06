@@ -4,7 +4,12 @@ import {
 } from '@jupiterone/integration-sdk-testing';
 import { integrationConfig } from '../test/config';
 import { setupProjectRecording } from '../test/recording';
-import { IntegrationConfig, validateInvocation } from './config';
+import { IntegrationConfig } from './config';
+import {
+  ALLOWED_REGIONS,
+  validateInvocation,
+  validateUrl,
+} from './validateInvocation';
 
 describe('#validateInvocation', () => {
   let recording: Recording;
@@ -15,90 +20,96 @@ describe('#validateInvocation', () => {
     }
   });
 
-  test('requires valid config', async () => {
-    const executionContext = createMockExecutionContext<IntegrationConfig>({
-      instanceConfig: {} as IntegrationConfig,
-    });
-
-    await expect(validateInvocation(executionContext)).rejects.toThrow(
-      'Config requires all of {clientId, clientSecret}',
-    );
-  });
-
-  /**
-   * Testing a successful authorization can be done with recordings
-   */
-  test.skip('successfully validates invocation', async () => {
-    recording = setupProjectRecording({
-      directory: __dirname,
-      name: 'validate-invocation',
-    });
-
-    // Pass integrationConfig to authenticate with real credentials
-    const executionContext = createMockExecutionContext({
-      instanceConfig: integrationConfig,
-    });
-
-    // successful validateInvocation doesn't throw errors and will be undefined
-    await expect(validateInvocation(executionContext)).resolves.toBeUndefined();
-  });
-
-  /* Adding `describe` blocks segments the tests into logical sections
-   * and makes the output of `yarn test --verbose` provide meaningful
-   * to project information to future maintainers.
-   */
-  describe('fails validating invocation', () => {
-    /**
-     * Testing failing authorizations can be done with recordings as well.
-     * For each possible failure case, a test can be made to ensure that
-     * error messaging is expected and clear to end-users
-     */
-    describe('invalid user credentials', () => {
-      test.skip('should throw if clientId is invalid', async () => {
-        recording = setupProjectRecording({
-          directory: __dirname,
-          name: 'client-id-auth-error',
-          // Many authorization failures will return non-200 responses
-          // and `recordFailedRequest: true` is needed to capture these responses
-          options: {
-            recordFailedRequests: true,
-          },
-        });
-
-        const executionContext = createMockExecutionContext({
-          instanceConfig: {
-            clientId: 'INVALID',
-            clientSecret: integrationConfig.clientSecret,
-          },
-        });
-
-        // tests validate that invalid configurations throw an error
-        // with an appropriate and expected message.
-        await expect(validateInvocation(executionContext)).rejects.toThrow(
-          'Provider authentication failed at https://localhost/api/v1/some/endpoint?limit=1: 401 Unauthorized',
-        );
+  describe('#validateInvocation - integration setup', () => {
+    test('requires valid config', async () => {
+      const executionContext = createMockExecutionContext<IntegrationConfig>({
+        instanceConfig: {} as IntegrationConfig,
       });
 
-      test.skip('should throw if clientSecret is invalid', async () => {
-        recording = setupProjectRecording({
-          directory: __dirname,
-          name: 'client-secret-auth-error',
-          options: {
-            recordFailedRequests: true,
-          },
-        });
+      await expect(validateInvocation(executionContext)).rejects.toThrow(
+        'Config requires all of {apiUrl, apiKey}',
+      );
+    });
 
-        const executionContext = createMockExecutionContext({
-          instanceConfig: {
-            clientId: integrationConfig.clientSecret,
-            clientSecret: 'INVALID',
-          },
-        });
-
-        await expect(validateInvocation(executionContext)).rejects.toThrow(
-          'Provider authentication failed at https://localhost/api/v1/some/endpoint?limit=1: 401 Unauthorized',
-        );
+    test('api url region does not exist', async () => {
+      const executionContext = createMockExecutionContext<IntegrationConfig>({
+        instanceConfig: {
+          apiKey: 'api-key',
+          apiUrl: 'non-existing.api.insight.rapid7.com',
+        } as IntegrationConfig,
       });
+
+      await expect(validateInvocation(executionContext)).rejects.toThrow(
+        `API url region is not valid. Please make sure to include a full API url with a valid region. Valid regions: ${ALLOWED_REGIONS.join(
+          ', ',
+        )}.`,
+      );
+    });
+
+    test('https is added to the URL if missing', () => {
+      const urlWithNoProtocol = 'us.api.insight.rapid7.com';
+      const executionContext = createMockExecutionContext<IntegrationConfig>({
+        instanceConfig: {
+          apiKey: 'api-key',
+          apiUrl: urlWithNoProtocol,
+        } as IntegrationConfig,
+      });
+
+      expect(validateUrl(executionContext.instance.config).apiUrl).toEqual(
+        `https://${urlWithNoProtocol}`,
+      );
+    });
+
+    test('https is NOT added to the URL if present', () => {
+      const urlWithProtocol = 'https://us.api.insight.rapid7.com';
+      const executionContext = createMockExecutionContext<IntegrationConfig>({
+        instanceConfig: {
+          apiKey: 'api-key',
+          apiUrl: urlWithProtocol,
+        } as IntegrationConfig,
+      });
+
+      expect(validateUrl(executionContext.instance.config).apiUrl).toEqual(
+        urlWithProtocol,
+      );
+    });
+  });
+
+  describe('#validateInvocation - credentials verification', () => {
+    test('#validateInvocation - valid credentials', async () => {
+      recording = setupProjectRecording({
+        directory: __dirname,
+        name: 'validate-invocation-valid-credentials',
+      });
+
+      const executionContext = createMockExecutionContext({
+        instanceConfig: integrationConfig,
+      });
+
+      await expect(
+        validateInvocation(executionContext),
+      ).resolves.toBeUndefined();
+    });
+
+    test('#validateInvocation - invalid credentials', async () => {
+      recording = setupProjectRecording({
+        directory: __dirname,
+        name: 'validate-invocation-invalid-credentials',
+        options: {
+          recordFailedRequests: true,
+        },
+      });
+
+      const executionContext = createMockExecutionContext({
+        instanceConfig: {
+          ...integrationConfig,
+          apiKey: 'invalid',
+        },
+      });
+
+      await expect(validateInvocation(executionContext)).rejects.toThrow(
+        'Unable to verify credentials: 401 Unauthorized',
+      );
     });
   });
 });

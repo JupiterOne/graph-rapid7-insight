@@ -1,7 +1,7 @@
 {
-  "name": "@jupiterone/graph-rapid7-insightvm",
+  "name": "@jupiterone/graph-rapid7-insight",
   "version": "0.0.0",
-  "description": "A graph conversion tool for Rapid7 InsightVM",
+  "description": "A graph conversion tool for Rapid7 Insight Platform",
   "license": "MPL-2.0",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -59,5 +59,9 @@
     "shipit": {
       "prerelease": false
     }
+  },
+  "dependencies": {
+    "@lifeomic/attempt": "^3.0.3",
+    "axios": "^0.27.2"
   }
 }

@@ -10,10 +10,10 @@ export function createAccountEntity(): Entity {
     entityData: {
       source: {},
       assign: {
-        _key: 'rapid7-insightvm-unique-account-id',
+        _key: 'rapid7-insight-unique-account-id',
         _type: Entities.ACCOUNT._type,
         _class: Entities.ACCOUNT._class,
-        name: 'rapid7-insightvm-account',
+        name: 'rapid7-insight-account',
       },
     },
   });
