@@ -3,10 +3,9 @@ import {
   IntegrationProviderAuthorizationError,
   IntegrationProviderAPIError,
 } from '@jupiterone/integration-sdk-core';
-import { Response } from 'node-fetch';
 
 export const httpErrorPolicy = {
-  handleError(response: Response, requestUrl: string) {
+  handleError(response, requestUrl: string) {
     if (response.status === 401) {
       throw new IntegrationProviderAuthenticationError({
         status: response.status,
