@@ -95,9 +95,18 @@ https://github.com/JupiterOne/sdk/blob/main/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources | Entity `_type` | Entity `_class` |
-| --------- | -------------- | --------------- |
-| Account   | `acme_account` | `Account`       |
+| Resources       | Entity `_type`           | Entity `_class` |
+| --------------- | ------------------------ | --------------- |
+| Account         | `rapid7_insight_account` | `Account`       |
+| Insight VM Site | `insightvm_site`         | `Site`          |
+
+### Relationships
+
+The following relationships are created:
+
+| Source Entity `_type`    | Relationship `_class` | Target Entity `_type` |
+| ------------------------ | --------------------- | --------------------- |
+| `rapid7_insight_account` | **HAS**               | `insightvm_site`      |
 
 <!--
 ********************************************************************************

@@ -2,17 +2,16 @@ import {
   createIntegrationEntity,
   Entity,
 } from '@jupiterone/integration-sdk-core';
+import { RootEntities } from './constants';
 
-import { Entities } from '../constants';
-
-export function createAccountEntity(): Entity {
+export function createAccountEntity(organizationId: string): Entity {
   return createIntegrationEntity({
     entityData: {
       source: {},
       assign: {
-        _key: 'rapid7-insight-unique-account-id',
-        _type: Entities.ACCOUNT._type,
-        _class: Entities.ACCOUNT._class,
+        _key: `rapid7_insight_account:${organizationId}`,
+        _type: RootEntities.ACCOUNT._type,
+        _class: RootEntities.ACCOUNT._class,
         name: 'rapid7-insight-account',
       },
     },
