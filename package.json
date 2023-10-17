@@ -2,6 +2,10 @@
   "name": "@jupiterone/graph-rapid7-insight",
   "version": "0.0.0",
   "description": "A graph conversion tool for Rapid7 Insight Platform",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JupiterOne/graph-rapid7-insight"
+  },
   "license": "MPL-2.0",
   "main": "src/index.js",
   "types": "src/index.d.ts",
