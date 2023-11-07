@@ -41,7 +41,7 @@ export function validateRegions(config: IntegrationConfig) {
   }
 
   // AppSec
-  if (!INSIGHT_APP_SEC_ALLOWED_REGIONS.includes(config.insightVMRegion)) {
+  if (!INSIGHT_APP_SEC_ALLOWED_REGIONS.includes(config.insightAppSecRegion)) {
     throw new IntegrationValidationError(
       `InsightAppSec region is not valid. Please make sure to include a full API url with a valid region. Valid regions: ${INSIGHT_APP_SEC_ALLOWED_REGIONS.join(
         ', ',
