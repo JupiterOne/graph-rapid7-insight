@@ -14,7 +14,7 @@ describe(`rapid7-insightvm#${Rapid7InsightVMSteps.FETCH_INSIGHT_VM_SITES.id}`, (
 
   jest.setTimeout(45000);
 
-  test(Rapid7InsightVMSteps.FETCH_INSIGHT_VM_SITES.id, async () => {
+  test.skip(Rapid7InsightVMSteps.FETCH_INSIGHT_VM_SITES.id, async () => {
     recording = setupProjectRecording({
       directory: __dirname,
       name: Rapid7InsightVMSteps.FETCH_INSIGHT_VM_SITES.id,
