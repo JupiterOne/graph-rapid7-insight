@@ -1,8 +1,8 @@
 import { RelationshipClass } from '@jupiterone/integration-sdk-core';
-import { RootEntities } from '../account/constants';
+import { RootEntities } from '../root/constants';
 
 export const Rapid7InsightVMSteps = {
-  FETCH_INSIGHTVM_SITES: {
+  FETCH_INSIGHT_VM_SITES: {
     id: 'fetch-insighvm-sites',
     name: 'Fetch InsightVM Sites',
   },
@@ -21,10 +21,10 @@ export const Rapid7InsightVMEntities = {
 };
 
 export const InsightVMRelationships = {
-  INSIGHT_ACCOUNT_HAS_SITE_RELATIONSHIP: {
-    _type: 'rapid7_insight_account_has_insightvm_site',
+  INSIGHT_VM_PRODUCT_HAS_SITE_RELATIONSHIP: {
+    _type: 'rapid7_insight_product_has_insightvm_site',
     _class: RelationshipClass.HAS,
-    sourceType: RootEntities.ACCOUNT._type,
+    sourceType: RootEntities.PRODUCT._type,
     targetType: Rapid7InsightVMEntities.INSIGHT_VM_SITE._type,
   },
 };

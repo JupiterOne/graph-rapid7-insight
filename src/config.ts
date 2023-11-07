@@ -4,16 +4,24 @@ import {
 } from '@jupiterone/integration-sdk-core';
 
 export const instanceConfigFields: IntegrationInstanceConfigFieldMap = {
-  apiUrl: {
-    type: 'string',
-  },
   apiKey: {
     type: 'string',
     mask: true,
   },
+  insightVMRegion: {
+    type: 'string',
+  },
+  insightAppSecRegion: {
+    type: 'string',
+  },
+  productCodesToIngest: {
+    type: 'string',
+  },
 };
 
 export interface IntegrationConfig extends IntegrationInstanceConfig {
-  apiUrl: string;
   apiKey: string;
+  insightVMRegion: string;
+  insightAppSecRegion: string;
+  productCodesToIngest: string;
 }

@@ -95,18 +95,32 @@ https://github.com/JupiterOne/sdk/blob/main/docs/integrations/development.md
 
 The following entities are created:
 
-| Resources       | Entity `_type`           | Entity `_class` |
-| --------------- | ------------------------ | --------------- |
-| Account         | `rapid7_insight_account` | `Account`       |
-| Insight VM Site | `insightvm_site`         | `Site`          |
+| Resources                  | Entity `_type`                 | Entity `_class` |
+| -------------------------- | ------------------------------ | --------------- |
+| Account                    | `rapid7_insight_account`       | `Account`       |
+| Insight VM Site            | `insightvm_site`               | `Site`          |
+| InsightAppSec App          | `insight_app_sec_app`          | `Application`   |
+| InsightAppSec Engine       | `insight_app_sec_engine`       | `Scanner`       |
+| InsightAppSec Engine Group | `insight_app_sec_engine_group` | `Group`         |
+| InsightAppSec Finding      | `insight_app_sec_finding`      | `Finding`       |
+| InsightAppSec Scan         | `insight_app_sec_scan`         | `Assessment`    |
+| InsightAppSec Scan Config  | `insight_app_sec_scan_config`  | `Configuration` |
+| Product                    | `rapid7_insight_product`       | `Product`       |
 
 ### Relationships
 
 The following relationships are created:
 
-| Source Entity `_type`    | Relationship `_class` | Target Entity `_type` |
-| ------------------------ | --------------------- | --------------------- |
-| `rapid7_insight_account` | **HAS**               | `insightvm_site`      |
+| Source Entity `_type`          | Relationship `_class` | Target Entity `_type`          |
+| ------------------------------ | --------------------- | ------------------------------ |
+| `insight_app_sec_app`          | **HAS**               | `insight_app_sec_finding`      |
+| `insight_app_sec_engine_group` | **HAS**               | `insight_app_sec_engine`       |
+| `insight_app_sec_engine_group` | **USES**              | `insight_app_sec_scan_config`  |
+| `insight_app_sec_scan_config`  | **PERFORMED**         | `insight_app_sec_scan`         |
+| `insight_app_sec_scan`         | **PROTECTS**          | `insight_app_sec_app`          |
+| `rapid7_insight_account`       | **HAS**               | `rapid7_insight_product`       |
+| `rapid7_insight_product`       | **HAS**               | `insight_app_sec_engine_group` |
+| `rapid7_insight_product`       | **HAS**               | `insightvm_site`               |
 
 <!--
 ********************************************************************************

@@ -1,19 +1,19 @@
 import {
-  Entity,
   IntegrationStep,
   IntegrationStepExecutionContext,
   RelationshipClass,
   createDirectRelationship,
 } from '@jupiterone/integration-sdk-core';
-import { Rapid7InsighVMClient } from '../client';
-import { IntegrationConfig } from '../../../config';
+import { Rapid7InsighVMClient } from '../../client';
+import { IntegrationConfig } from '../../../../config';
 import {
   InsightVMRelationships,
   Rapid7InsightVMEntities,
   Rapid7InsightVMSteps,
-} from '../constants';
-import { createSiteEntity } from '../converter';
-import { RootSteps } from '../../account/constants';
+} from '../../constants';
+import { createSiteEntity } from '../../converter';
+import { RootSteps } from '../../../root/constants';
+import { getProductKey } from '../../../root/converter';
 
 async function fetchSites(
   context: IntegrationStepExecutionContext<IntegrationConfig>,
@@ -40,13 +40,13 @@ async function buildInsightAccountSiteRelationships(
       _type: Rapid7InsightVMEntities.INSIGHT_VM_SITE._type,
     },
     async (site) => {
-      const accountEntity = await jobState.getData<Entity>('entity:account');
+      const productEntity = await jobState.findEntity(getProductKey('IVM'));
 
-      if (!accountEntity) return;
+      if (!productEntity) return;
 
       const accountSiteRelationship = createDirectRelationship({
         _class: RelationshipClass.HAS,
-        from: accountEntity,
+        from: productEntity,
         to: site,
       });
 
@@ -59,8 +59,8 @@ async function buildInsightAccountSiteRelationships(
 
 export const sitesStepMap: IntegrationStep<IntegrationConfig>[] = [
   {
-    id: Rapid7InsightVMSteps.FETCH_INSIGHTVM_SITES.id,
-    name: Rapid7InsightVMSteps.FETCH_INSIGHTVM_SITES.name,
+    id: Rapid7InsightVMSteps.FETCH_INSIGHT_VM_SITES.id,
+    name: Rapid7InsightVMSteps.FETCH_INSIGHT_VM_SITES.name,
     entities: [Rapid7InsightVMEntities.INSIGHT_VM_SITE],
     relationships: [],
     dependsOn: [],
@@ -71,11 +71,11 @@ export const sitesStepMap: IntegrationStep<IntegrationConfig>[] = [
     name: Rapid7InsightVMSteps.BUILD_ACCOUNT_SITE_RELATIONSHIP.name,
     entities: [],
     relationships: [
-      InsightVMRelationships.INSIGHT_ACCOUNT_HAS_SITE_RELATIONSHIP,
+      InsightVMRelationships.INSIGHT_VM_PRODUCT_HAS_SITE_RELATIONSHIP,
     ],
     dependsOn: [
       RootSteps.FETCH_ACCOUNT.id,
-      Rapid7InsightVMSteps.FETCH_INSIGHTVM_SITES.id,
+      Rapid7InsightVMSteps.FETCH_INSIGHT_VM_SITES.id,
     ],
     executionHandler: buildInsightAccountSiteRelationships,
   },

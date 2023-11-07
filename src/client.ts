@@ -5,8 +5,7 @@ import {
 import { IntegrationConfig } from './config';
 import { retry, sleep } from '@lifeomic/attempt';
 import fetch, { RequestInit } from 'node-fetch';
-import { CommonResponse, Product, Rapid7ApiCallback } from './types';
-import { buildQueryParams } from './utils';
+import { Product } from './types';
 import { httpErrorPolicy } from './HttpErrorPolicy';
 
 export const DEFAULT_ATTEMPT_OPTIONS = {
@@ -16,7 +15,7 @@ export const DEFAULT_ATTEMPT_OPTIONS = {
   factor: 2,
 };
 
-const ACCOUNT_VERTICAL = '/account';
+export const API_BASE_URL = 'api.insight.rapid7.com';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
@@ -83,37 +82,10 @@ export class APIClient {
     });
   }
 
-  public async iterateApi<T>(
-    cb: Rapid7ApiCallback<T>,
-    size: string,
-    urlPath: string,
-    init?: RequestInit,
-  ) {
-    let hasNext = true;
-    let page = 0;
-
-    do {
-      const response = await this.executeAPIRequestWithRetries<
-        CommonResponse<T>
-      >(
-        `${this.integrationConfig.apiUrl}${urlPath}${buildQueryParams({
-          size,
-          page: String(page),
-        })}`,
-        init,
-      );
-
-      hasNext = page > response.metadata.totalPages;
-      page = page + 1;
-
-      await cb(response.data);
-    } while (hasNext);
-  }
-
   public async verifyAuthentication(): Promise<void> {
     try {
       await this.executeAPIRequestWithRetries(
-        `${this.integrationConfig.apiUrl}/validate`,
+        `https://us.${API_BASE_URL}/validate`,
       );
     } catch (err) {
       throw new IntegrationError({
@@ -125,7 +97,7 @@ export class APIClient {
 
   public async fetchAccountProducts(): Promise<Product[]> {
     return this.executeAPIRequestWithRetries<Product[]>(
-      `${this.integrationConfig.apiUrl}/${ACCOUNT_VERTICAL}/api/1/products`,
+      `https://us.${API_BASE_URL}/account/api/1/products`,
     );
   }
 

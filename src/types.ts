@@ -1,18 +1,11 @@
+export enum ProductCode {
+  INSIGHT_VM = 'IVM',
+  INSIGHT_APP_SEC = 'AS',
+}
+
 export type Link = {
   rel: string;
   href: string;
-};
-
-export type CommonResponse<T> = {
-  data: T[];
-  metadata: {
-    number: number;
-    size: number;
-    totalResources: number;
-    totalPages: number;
-    cursor?: number;
-  };
-  links: Link[];
 };
 
 export type Rapid7ApiCallback<T> = (
@@ -26,7 +19,7 @@ export type Product = {
   organization_name: string;
 };
 
-export type Site = {
-  name: string;
+export type SeachBody = {
+  query: string;
   type: string;
 };
