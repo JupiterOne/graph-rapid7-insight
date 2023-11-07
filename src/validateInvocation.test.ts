@@ -6,11 +6,9 @@ import { integrationConfig } from '../test/config';
 import { setupProjectRecording } from '../test/recording';
 import { IntegrationConfig } from './config';
 import {
-  ALLOWED_REGIONS,
   INSIGHT_APP_SEC_ALLOWED_REGIONS,
   INSIGHT_VM_ALLOWED_REGIONS,
   validateInvocation,
-  validateUrl,
 } from './validateInvocation';
 
 describe('#validateInvocation', () => {
