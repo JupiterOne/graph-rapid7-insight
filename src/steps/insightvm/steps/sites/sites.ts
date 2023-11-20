@@ -12,7 +12,7 @@ import {
   Rapid7InsightVMSteps,
 } from '../../constants';
 import { createSiteEntity } from '../../converter';
-import { RootSteps } from '../../../root/constants';
+import { RootEntities, RootSteps } from '../../../root/constants';
 import { getProductKey } from '../../../root/converter';
 
 async function fetchSites(
@@ -40,14 +40,12 @@ async function buildInsightAccountSiteRelationships(
       _type: Rapid7InsightVMEntities.INSIGHT_VM_SITE._type,
     },
     async (site) => {
-      const productEntity = await jobState.findEntity(getProductKey('IVM'));
-
-      if (!productEntity) return;
-
       const accountSiteRelationship = createDirectRelationship({
         _class: RelationshipClass.HAS,
-        from: productEntity,
-        to: site,
+        fromKey: getProductKey('IVM'),
+        fromType: RootEntities.PRODUCT._type,
+        toKey: site._key,
+        toType: site._type,
       });
 
       if (jobState.hasKey(accountSiteRelationship._key)) return;

@@ -1,5 +1,4 @@
 import {
-  Entity,
   IntegrationStep,
   IntegrationStepExecutionContext,
   RelationshipClass,
@@ -26,34 +25,24 @@ async function fetchScanConfigs(
   } = context;
   const client = new Rapid7InsighAppSecClient(config, logger);
 
-  const defaultCloudEngineGroup = await jobState.findEntity(
-    getEngineGroupKey(DEFAULT_CLOUD_ENGINE_GROUP_ID),
-  );
-
   await client.seachAndIterateResources<ScanConfig>(
     async (scanConfig) => {
       const scanConfigEntity = createScanConfigEntity(scanConfig);
 
-      let engineGroupEntityToAssing: Entity | null = defaultCloudEngineGroup;
+      const scanConfigAssigmentId = scanConfig.assignment?.id;
 
-      if (scanConfig.assignment?.id) {
-        const engineGroupEntity = await jobState.findEntity(
-          getEngineGroupKey(scanConfig.assignment?.id),
-        );
-        if (engineGroupEntity) {
-          engineGroupEntityToAssing = engineGroupEntity;
-        }
-      }
-
-      if (engineGroupEntityToAssing) {
-        await jobState.addRelationship(
-          createDirectRelationship({
-            _class: RelationshipClass.USES,
-            from: engineGroupEntityToAssing,
-            to: scanConfigEntity,
-          }),
-        );
-      }
+      await jobState.addRelationship(
+        createDirectRelationship({
+          _class: RelationshipClass.USES,
+          fromKey: scanConfigAssigmentId
+            ? getEngineGroupKey(scanConfigAssigmentId)
+            : getEngineGroupKey(DEFAULT_CLOUD_ENGINE_GROUP_ID),
+          fromType:
+            Rapid7InsightAppSecEntities.INSIGHT_APP_SEC_ENGINE_GROUP._type,
+          toKey: scanConfigEntity._key,
+          toType: scanConfigEntity._type,
+        }),
+      );
 
       await jobState.addEntity(scanConfigEntity);
     },

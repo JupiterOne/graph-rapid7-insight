@@ -36,19 +36,15 @@ async function fetchScans(
 
           // Create Scan -> PROTECTS -> App
           if (scan.app?.id) {
-            const appEntity = await jobState.findEntity(
-              getApplicationKey(scan.app?.id),
+            await jobState.addRelationship(
+              createDirectRelationship({
+                _class: RelationshipClass.PROTECTS,
+                fromKey: scanEntity._key,
+                fromType: scanEntity._type,
+                toKey: getApplicationKey(scan.app?.id),
+                toType: Rapid7InsightAppSecEntities.INSIGHT_APP_SEC_APP._type,
+              }),
             );
-
-            if (appEntity) {
-              await jobState.addRelationship(
-                createDirectRelationship({
-                  _class: RelationshipClass.PROTECTS,
-                  from: scanEntity,
-                  to: appEntity,
-                }),
-              );
-            }
           }
 
           // Create Scan Config -> PERFORMED -> Scan
