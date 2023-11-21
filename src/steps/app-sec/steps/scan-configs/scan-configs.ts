@@ -25,26 +25,31 @@ async function fetchScanConfigs(
   } = context;
   const client = new Rapid7InsighAppSecClient(config, logger);
 
+  const defaultEngineGroupEntityKey = getEngineGroupKey(
+    DEFAULT_CLOUD_ENGINE_GROUP_ID,
+  );
+
   await client.seachAndIterateResources<ScanConfig>(
     async (scanConfig) => {
       const scanConfigEntity = createScanConfigEntity(scanConfig);
+      await jobState.addEntity(scanConfigEntity);
 
       const scanConfigAssigmentId = scanConfig.assignment?.id;
 
-      await jobState.addRelationship(
-        createDirectRelationship({
-          _class: RelationshipClass.USES,
-          fromKey: scanConfigAssigmentId
-            ? getEngineGroupKey(scanConfigAssigmentId)
-            : getEngineGroupKey(DEFAULT_CLOUD_ENGINE_GROUP_ID),
-          fromType:
-            Rapid7InsightAppSecEntities.INSIGHT_APP_SEC_ENGINE_GROUP._type,
-          toKey: scanConfigEntity._key,
-          toType: scanConfigEntity._type,
-        }),
-      );
-
-      await jobState.addEntity(scanConfigEntity);
+      if (jobState.hasKey(defaultEngineGroupEntityKey)) {
+        await jobState.addRelationship(
+          createDirectRelationship({
+            _class: RelationshipClass.USES,
+            fromKey: scanConfigAssigmentId
+              ? getEngineGroupKey(scanConfigAssigmentId)
+              : defaultEngineGroupEntityKey,
+            fromType:
+              Rapid7InsightAppSecEntities.INSIGHT_APP_SEC_ENGINE_GROUP._type,
+            toKey: scanConfigEntity._key,
+            toType: scanConfigEntity._type,
+          }),
+        );
+      }
     },
     {
       query: `scanconfig.assignment.type = 'ENGINE_GROUP'`,

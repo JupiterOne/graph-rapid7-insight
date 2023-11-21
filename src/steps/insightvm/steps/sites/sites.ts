@@ -40,17 +40,21 @@ async function buildInsightAccountSiteRelationships(
       _type: Rapid7InsightVMEntities.INSIGHT_VM_SITE._type,
     },
     async (site) => {
-      const accountSiteRelationship = createDirectRelationship({
-        _class: RelationshipClass.HAS,
-        fromKey: getProductKey('IVM'),
-        fromType: RootEntities.PRODUCT._type,
-        toKey: site._key,
-        toType: site._type,
-      });
+      const productEntityKey = getProductKey('IVM');
 
-      if (jobState.hasKey(accountSiteRelationship._key)) return;
+      if (jobState.hasKey(productEntityKey)) {
+        const accountSiteRelationship = createDirectRelationship({
+          _class: RelationshipClass.HAS,
+          fromKey: getProductKey('IVM'),
+          fromType: RootEntities.PRODUCT._type,
+          toKey: site._key,
+          toType: site._type,
+        });
 
-      await jobState.addRelationship(accountSiteRelationship);
+        if (jobState.hasKey(accountSiteRelationship._key)) return;
+
+        await jobState.addRelationship(accountSiteRelationship);
+      }
     },
   );
 }

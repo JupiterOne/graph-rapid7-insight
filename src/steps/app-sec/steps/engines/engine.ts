@@ -34,15 +34,22 @@ async function fetchEngines(
 
   await jobState.addEntity(cloudDefaultEngineEntity);
 
-  await jobState.addRelationship(
-    createDirectRelationship({
-      _class: RelationshipClass.HAS,
-      fromKey: getEngineGroupKey(DEFAULT_CLOUD_ENGINE_GROUP_ID),
-      fromType: Rapid7InsightAppSecEntities.INSIGHT_APP_SEC_ENGINE_GROUP._type,
-      toKey: cloudDefaultEngineEntity._key,
-      toType: cloudDefaultEngineEntity._type,
-    }),
+  const defaultEngineGroupEntityKey = getEngineGroupKey(
+    DEFAULT_CLOUD_ENGINE_GROUP_ID,
   );
+
+  if (jobState.hasKey(defaultEngineGroupEntityKey)) {
+    await jobState.addRelationship(
+      createDirectRelationship({
+        _class: RelationshipClass.HAS,
+        fromKey: defaultEngineGroupEntityKey,
+        fromType:
+          Rapid7InsightAppSecEntities.INSIGHT_APP_SEC_ENGINE_GROUP._type,
+        toKey: cloudDefaultEngineEntity._key,
+        toType: cloudDefaultEngineEntity._type,
+      }),
+    );
+  }
 
   await jobState.iterateEntities(
     { _type: Rapid7InsightAppSecEntities.INSIGHT_APP_SEC_ENGINE_GROUP._type },
@@ -55,15 +62,13 @@ async function fetchEngines(
 
           await jobState.addEntity(engineEntity);
 
-          if (engine.engine_group?.id) {
-            await jobState.addRelationship(
-              createDirectRelationship({
-                _class: RelationshipClass.HAS,
-                from: engineGroupEntity,
-                to: engineEntity,
-              }),
-            );
-          }
+          await jobState.addRelationship(
+            createDirectRelationship({
+              _class: RelationshipClass.HAS,
+              from: engineGroupEntity,
+              to: engineEntity,
+            }),
+          );
         },
         {
           query: `engine.engine_group.id = '${engineGroupRawData?.id}'`,
