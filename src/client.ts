@@ -4,7 +4,9 @@ import {
 } from '@jupiterone/integration-sdk-core';
 import { IntegrationConfig } from './config';
 import { retry, sleep } from '@lifeomic/attempt';
-import axios, { AxiosResponse } from 'axios';
+import fetch, { RequestInit } from 'node-fetch';
+import { Product } from './types';
+import { httpErrorPolicy } from './HttpErrorPolicy';
 
 export const DEFAULT_ATTEMPT_OPTIONS = {
   maxAttempts: 5,
@@ -12,6 +14,8 @@ export const DEFAULT_ATTEMPT_OPTIONS = {
   timeout: 180_000,
   factor: 2,
 };
+
+export const API_BASE_URL = 'api.insight.rapid7.com';
 
 export type ResourceIteratee<T> = (each: T) => Promise<void> | void;
 
@@ -34,27 +38,34 @@ export class APIClient {
 
   public executeAPIRequestWithRetries<T>(
     requestUrl: string,
-  ): Promise<AxiosResponse<T>> {
+    init?: RequestInit,
+  ): Promise<T> {
     const requestAttempt = async () => {
-      const response = await axios.get(requestUrl, {
+      const response = await fetch(requestUrl, {
+        ...init,
         headers: {
+          ...init?.headers,
           ...this.getDefaultHeaders(),
         },
       });
 
-      return response;
+      if (response.ok) {
+        return response.json();
+      }
+
+      httpErrorPolicy.handleError(response, requestUrl);
     };
 
     return retry(requestAttempt, {
       ...DEFAULT_ATTEMPT_OPTIONS,
       handleError: async (err, attemptContext) => {
-        if (err.response.status === 401) {
+        if (err.status === 401) {
           attemptContext.abort();
 
           return;
         }
 
-        if (err.response.status === 429) {
+        if (err.status === 429) {
           const retryAfter = err.retryAfter ? err.retryAfter * 1000 : 5000;
           this.logger.info(
             { retryAfter },
@@ -74,14 +85,20 @@ export class APIClient {
   public async verifyAuthentication(): Promise<void> {
     try {
       await this.executeAPIRequestWithRetries(
-        `${this.integrationConfig.apiUrl}/validate`,
+        `https://us.${API_BASE_URL}/validate`,
       );
     } catch (err) {
       throw new IntegrationError({
-        message: `Unable to verify credentials: ${err.response.status} ${err.response.data.message}`,
-        code: err.response.status,
+        message: `Unable to verify credentials: ${err.status} ${err.statusText}`,
+        code: err.statusText,
       });
     }
+  }
+
+  public async fetchAccountProducts(): Promise<Product[]> {
+    return this.executeAPIRequestWithRetries<Product[]>(
+      `https://us.${API_BASE_URL}/account/api/1/products`,
+    );
   }
 
   /**

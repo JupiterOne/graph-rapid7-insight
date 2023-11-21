@@ -10,12 +10,18 @@ if (process.env.LOAD_ENV) {
     path: path.join(__dirname, '../.env'),
   });
 }
-const DEFAULT_API_URL = 'us.api.insight.rapid7.com';
 const DEFAULT_API_KEY = 'api-key';
+const DEFAULT_INSIGHT_VM_REGION = 'us';
+const DEFAULT_INSIGHT_APP_SEC_REGION = 'us2';
+const DEFAULT_PRODUCT_CODES_TO_INGEST = 'IVM,AS';
 
 export const integrationConfig: IntegrationConfig = {
-  apiUrl: process.env.API_URL || DEFAULT_API_URL,
   apiKey: process.env.API_KEY || DEFAULT_API_KEY,
+  insightVMRegion: process.env.INSIGHT_VM_REGION || DEFAULT_INSIGHT_VM_REGION,
+  insightAppSecRegion:
+    process.env.INSIGHT_APP_SEC_REGION || DEFAULT_INSIGHT_APP_SEC_REGION,
+  productCodesToIngest:
+    process.env.PRODUCT_CODES_TO_INGEST || DEFAULT_PRODUCT_CODES_TO_INGEST,
 };
 
 export function buildStepTestConfigForStep(stepId: string): StepTestConfig {

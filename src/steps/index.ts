@@ -1,5 +1,12 @@
-import { accountSteps } from './account';
+import { accountSteps } from './root';
+import { insightAppSecSteps } from './app-sec';
 
-const integrationSteps = [...accountSteps];
+import { insightVMSteps } from './insightvm';
+
+const integrationSteps = [
+  ...accountSteps,
+  ...insightVMSteps,
+  ...insightAppSecSteps,
+];
 
 export { integrationSteps };

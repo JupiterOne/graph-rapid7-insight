@@ -1,25 +1,25 @@
-// Providers often supply types with their API libraries.
-
-export interface AcmeUser {
-  id: string;
-  name: string;
+export enum ProductCode {
+  INSIGHT_VM = 'IVM',
+  INSIGHT_APP_SEC = 'AS',
 }
 
-export interface AcmeGroup {
-  id: string;
-  name: string;
-  users?: Pick<AcmeUser, 'id'>[];
-}
+export type Link = {
+  rel: string;
+  href: string;
+};
 
-// Those can be useful to a degree, but often they're just full of optional
-// values. Understanding the response data may be more reliably accomplished by
-// reviewing the API response recordings produced by testing the wrapper client
-// (./client.ts). However, when there are no types provided, it is necessary to define
-// opaque types for each resource, to communicate the records that are expected
-// to come from an endpoint and are provided to iterating functions.
+export type Rapid7ApiCallback<T> = (
+  data: T[],
+) => boolean | void | Promise<boolean | void>;
 
-/*
-import { Opaque } from 'type-fest';
-export type AcmeUser = Opaque<any, 'AcmeUser'>;
-export type AcmeGroup = Opaque<any, 'AcmeGroup'>;
-*/
+export type Product = {
+  product_token: string;
+  product_code: string;
+  organization_id: string;
+  organization_name: string;
+};
+
+export type SeachBody = {
+  query: string;
+  type: string;
+};

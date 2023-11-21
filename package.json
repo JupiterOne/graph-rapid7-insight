@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "@lifeomic/attempt": "^3.0.3",
-    "axios": "^0.27.2"
+    "@types/node-fetch": "^2.6.4",
+    "node-fetch": "^2.6.7"
   }
 }

@@ -6,9 +6,9 @@ import { integrationConfig } from '../test/config';
 import { setupProjectRecording } from '../test/recording';
 import { IntegrationConfig } from './config';
 import {
-  ALLOWED_REGIONS,
+  INSIGHT_APP_SEC_ALLOWED_REGIONS,
+  INSIGHT_VM_ALLOWED_REGIONS,
   validateInvocation,
-  validateUrl,
 } from './validateInvocation';
 
 describe('#validateInvocation', () => {
@@ -27,50 +27,56 @@ describe('#validateInvocation', () => {
       });
 
       await expect(validateInvocation(executionContext)).rejects.toThrow(
-        'Config requires all of {apiUrl, apiKey}',
+        'Config requires all of {apiKey, insightAppSecRegion, insightVMRegion, productCodesToIngest}',
       );
     });
 
-    test('api url region does not exist', async () => {
+    test('Should validate InsightAppSec region', async () => {
       const executionContext = createMockExecutionContext<IntegrationConfig>({
         instanceConfig: {
           apiKey: 'api-key',
-          apiUrl: 'non-existing.api.insight.rapid7.com',
+          insightAppSecRegion: 'INVALID',
+          insightVMRegion: 'us',
+          productCodesToIngest: 'IVM',
         } as IntegrationConfig,
       });
 
       await expect(validateInvocation(executionContext)).rejects.toThrow(
-        `API url region is not valid. Please make sure to include a full API url with a valid region. Valid regions: ${ALLOWED_REGIONS.join(
+        `InsightAppSec region is not valid. Please make sure to include a full API url with a valid region. Valid regions: ${INSIGHT_APP_SEC_ALLOWED_REGIONS.join(
           ', ',
         )}.`,
       );
     });
 
-    test('https is added to the URL if missing', () => {
-      const urlWithNoProtocol = 'us.api.insight.rapid7.com';
+    test('Should validate InsightVM region', async () => {
       const executionContext = createMockExecutionContext<IntegrationConfig>({
         instanceConfig: {
           apiKey: 'api-key',
-          apiUrl: urlWithNoProtocol,
+          insightAppSecRegion: 'us2',
+          insightVMRegion: 'INVALID',
+          productCodesToIngest: 'IVM',
         } as IntegrationConfig,
       });
 
-      expect(validateUrl(executionContext.instance.config).apiUrl).toEqual(
-        `https://${urlWithNoProtocol}`,
+      await expect(validateInvocation(executionContext)).rejects.toThrow(
+        `InsightVM region is not valid. Please make sure to include a full API url with a valid region. Valid regions: ${INSIGHT_VM_ALLOWED_REGIONS.join(
+          ', ',
+        )}.`,
       );
     });
 
-    test('https is NOT added to the URL if present', () => {
-      const urlWithProtocol = 'https://us.api.insight.rapid7.com';
+    test('Should validate product codes to ingest', async () => {
       const executionContext = createMockExecutionContext<IntegrationConfig>({
         instanceConfig: {
           apiKey: 'api-key',
-          apiUrl: urlWithProtocol,
+          insightAppSecRegion: 'us2',
+          insightVMRegion: 'us',
+          productCodesToIngest: 'IVM,INVALID',
         } as IntegrationConfig,
       });
 
-      expect(validateUrl(executionContext.instance.config).apiUrl).toEqual(
-        urlWithProtocol,
+      await expect(validateInvocation(executionContext)).rejects.toThrow(
+        `INVALID is not a supported product code.`,
       );
     });
   });
